@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+celery = "*"
+django-mptt = "*"
+django-rest-swagger = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+djoser = "*"
+pillow = "*"
+drf-yasg = "*"
+
+[requires]
+python_version = "3.8"
+
+[dev-packages]
+pytest = "*"
+pytest-django = "*"
+pytest-cov = "*"
+factory-boy = "*"
