@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     # libs
     'mptt',
+
     'djoser',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 
     # apps
     'apps.users',
+    'apps.catalog',
 ]
 
 MIDDLEWARE = [
