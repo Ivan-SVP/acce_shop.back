@@ -16,8 +16,10 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
+from apps.users import urls as users_urls
+from apps.catalog import urls as catalog_urls
 from config.docs_schemes import get_docs_schema_view
 
 docs_schema_view = get_docs_schema_view()
@@ -27,6 +29,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('api/docs/', docs_schema_view.with_ui('redoc', cache_timeout=0)),
+    path('api/', include(users_urls, namespace='users')),
+    path('api/catalog/', include(catalog_urls, namespace='catalog')),
 ]
 
 if settings.DEBUG:
