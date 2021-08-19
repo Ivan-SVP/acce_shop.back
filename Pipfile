@@ -4,15 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-celery = "*"
+django = "==3.2.5"
 django-mptt = "*"
 django-rest-swagger = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 djoser = "*"
-pillow = "*"
 drf-yasg = "*"
+django-uuslug = "*"
+celery = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.8"
