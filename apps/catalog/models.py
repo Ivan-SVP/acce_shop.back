@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -39,12 +40,18 @@ class Product(models.Model):
     supplier = models.ForeignKey(Supplier, related_name='products', on_delete=models.CASCADE)
     set_number = models.CharField('Артикул поставщика', max_length=255)
     supplier_quantity = models.IntegerField('Количество на складе')
-    supplier_price = models.DecimalField('Цена поставщика', decimal_places=2, max_digits=6)
+    supplier_price = models.DecimalField('Цена поставщика', decimal_places=2, max_digits=7)
 
-    price = models.DecimalField('Розничная цена', decimal_places=2, max_digits=6)
+    price = models.DecimalField('Розничная цена', decimal_places=0, max_digits=7)
+    discount = models.PositiveSmallIntegerField('Скидка %', default=0, blank=True,
+                                                validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     def __str__(self):
         return self.title
+
+    @property
+    def discount_price(self):
+        return self.price - self.price * self.discount/100
 
 
 def get_product_image_image_upload_path(instance, filename):
