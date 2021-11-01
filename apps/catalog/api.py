@@ -23,6 +23,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = {
         'category__slug': ['exact'],
         'price': ['gte', 'lte'],
+        'slug': ['in'],
     }
     search_fields = [
         'title',
@@ -39,6 +40,9 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         response = super().list(request, *args, **kwargs)
         self.add_price_range_to_response(response)
         return response
+
+    def get_queryset(self):
+        pass  # TODO для списка отдавать только доступные
 
     def add_price_range_to_response(self, response):
         """Добавляет в ответ диапазон цен для текущей выборки."""

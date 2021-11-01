@@ -3,7 +3,7 @@ from rest_framework import serializers
 from apps.catalog.models import Category
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):  # TODO только нужные поля
     products_count = serializers.IntegerField(source='products__count')
 
     class Meta:

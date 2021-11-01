@@ -12,4 +12,4 @@ class BaseProductImageSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(BaseProductImageSerializer):
 
     class Meta(BaseProductImageSerializer.Meta):
-        fields = ('image', )
+        fields = ('id', 'image')

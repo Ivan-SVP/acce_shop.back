@@ -20,6 +20,8 @@ from django.urls import path, include
 
 from apps.users import urls as users_urls
 from apps.catalog import urls as catalog_urls
+from apps.orders import urls as orders_urls
+
 from config.docs_schemes import get_docs_schema_view
 
 docs_schema_view = get_docs_schema_view()
@@ -31,6 +33,7 @@ urlpatterns = [
     path('api/docs/', docs_schema_view.with_ui('redoc', cache_timeout=0)),
     path('api/', include(users_urls, namespace='users')),
     path('api/catalog/', include(catalog_urls, namespace='catalog')),
+    path('api/orders/', include(orders_urls, namespace='orders')),
 ]
 
 if settings.DEBUG:
