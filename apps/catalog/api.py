@@ -9,7 +9,9 @@ from apps.catalog.serializers.product import ProductSerializer
 
 class CategoryViewSet(mixins.ListModelMixin,
                       GenericViewSet):
-    queryset = Category.objects.annotate(Count('products'))
+    queryset = Category.objects.get_with_products_count(
+        Category.objects.root_nodes().filter(available=True),
+    ).filter(products__count__gt=0)
     lookup_field = 'slug'
     serializer_class = CategorySerializer
     pagination_class = None
@@ -42,12 +44,16 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         return response
 
     def get_queryset(self):
-        pass  # TODO для списка отдавать только доступные
+        qs = super(ProductViewSet, self).get_queryset()
+        if self.action == 'list':
+            qs = qs.available()
+        return qs
 
     def add_price_range_to_response(self, response):
         """Добавляет в ответ диапазон цен для текущей выборки."""
         if response.data.get('results'):
-            price_range = self.filter_queryset(self.get_queryset()).aggregate(min_price=Min('price'), max_price=Max('price'))
+            price_range = self.filter_queryset(self.get_queryset()).aggregate(min_price=Min('price'),
+                                                                              max_price=Max('price'))
             price_range_data = {'min_price': price_range['min_price'], 'max_price': price_range['max_price']}
             response.data.update(price_range_data)
 

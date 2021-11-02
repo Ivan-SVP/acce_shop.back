@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=255)),
                 ('slug', models.SlugField(blank=True, max_length=255, unique=True)),
-                ('image', models.ImageField(blank=True, null=True, upload_to=apps.catalog.models.get_catalog_image_upload_path)),
+                ('image', models.ImageField(blank=True, null=True, upload_to=apps.catalog.models.category.get_catalog_image_upload_path)),
                 ('available', models.BooleanField(default=False, help_text='Доступны покупателям', verbose_name='Доступность')),
                 ('lft', models.PositiveIntegerField(editable=False)),
                 ('rght', models.PositiveIntegerField(editable=False)),
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
             name='ProductImage',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to=apps.catalog.models.get_product_image_image_upload_path)),
+                ('image', models.ImageField(upload_to=apps.catalog.models.product_image.get_product_image_image_upload_path)),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='product_images', to='catalog.product')),
             ],
         ),

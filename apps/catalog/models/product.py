@@ -1,7 +1,8 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from apps.catalog.models import Category, Supplier
+from apps.catalog.models import Supplier
+from apps.catalog.models.category import Category
 
 
 class ProductQuerySet(models.QuerySet):
