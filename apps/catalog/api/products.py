@@ -1,20 +1,34 @@
-from django.db.models import Count, Min, Max
-from rest_framework import viewsets, mixins
-from rest_framework.viewsets import GenericViewSet
+import logging
+
+import django_filters
+from django.db.models import Min, Max
+from rest_framework import viewsets
 
 from apps.catalog.models import Product, Category
-from apps.catalog.serializers.category import CategorySerializer
 from apps.catalog.serializers.product import ProductSerializer
 
+logger = logging.getLogger(__name__)
 
-class CategoryViewSet(mixins.ListModelMixin,
-                      GenericViewSet):
-    queryset = Category.objects.get_with_products_count(
-        Category.objects.root_nodes().filter(available=True),
-    ).filter(products__count__gt=0)
-    lookup_field = 'slug'
-    serializer_class = CategorySerializer
-    pagination_class = None
+
+class ProductFilter(django_filters.FilterSet):
+    category__slug = django_filters.CharFilter(method='filter_category')
+
+    class Meta:
+        model = Product
+        fields = {
+            'category__slug': ['exact'],
+        }
+
+    def filter_category(self, queryset, name, value):
+        try:
+            category = Category.objects.get(slug=value)
+            descendant__slugs = category.get_descendants(include_self=True).values_list('slug', flat=True)
+            return queryset.filter(**{
+                f'{name}__in': descendant__slugs,
+            })
+        except Exception as ex:
+            logger.exception(ex)
+            return queryset
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,8 +36,8 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'slug'
     serializer_class = ProductSerializer
 
+    filterset_class = ProductFilter
     filterset_fields = {
-        'category__slug': ['exact'],
         'price': ['gte', 'lte'],
         'slug': ['in'],
     }
@@ -49,6 +63,12 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             qs = qs.available()
         return qs
 
+    def clean_price_query_params(self, request):
+        request.query_params._mutable = True
+        for condition in self.filterset_fields['price']:
+            request.query_params.pop(f'price__{condition}', None)
+        request.query_params._mutable = False
+
     def add_price_range_to_response(self, response):
         """Добавляет в ответ диапазон цен для текущей выборки."""
         if response.data.get('results'):
@@ -56,9 +76,3 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
                                                                               max_price=Max('price'))
             price_range_data = {'min_price': price_range['min_price'], 'max_price': price_range['max_price']}
             response.data.update(price_range_data)
-
-    def clean_price_query_params(self, request):
-        request.query_params._mutable = True
-        for condition in self.filterset_fields['price']:
-            request.query_params.pop(f'price__{condition}', None)
-        request.query_params._mutable = False
