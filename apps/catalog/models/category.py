@@ -1,6 +1,7 @@
 from django.db import models
+from django.db.models import OuterRef, ManyToManyField
 from mptt.fields import TreeForeignKey
-from mptt.managers import TreeManager
+from mptt.managers import TreeManager, SQCount
 from mptt.models import MPTTModel
 
 
@@ -22,8 +23,47 @@ class CategoryManager(TreeManager):
             extra_filters={
                 'available': True,
                 'supplier_quantity__gt': 0,
+                'product_images__isnull': False,
             }
         )
+
+    def add_related_count(
+        self,
+        queryset,
+        rel_model,
+        rel_field,
+        count_attr,
+        cumulative=False,
+        extra_filters=None,
+    ):
+        """Пришлось продублировать метод либы, чтобы добавить distinct для subquery, т.к. count считался неверно."""
+        extra_filters = extra_filters if extra_filters is not None else {}
+
+        if cumulative:
+            subquery_filters = {
+                rel_field + "__tree_id": OuterRef(self.tree_id_attr),
+                rel_field + "__lft__gte": OuterRef(self.left_attr),
+                rel_field + "__lft__lte": OuterRef(self.right_attr),
+            }
+        else:
+            current_rel_model = rel_model
+            for rel_field_part in rel_field.split('__'):
+                current_mptt_field = current_rel_model._meta.get_field(rel_field_part)
+                current_rel_model = current_mptt_field.related_model
+            mptt_field = current_mptt_field
+
+            if isinstance(mptt_field, ManyToManyField):
+                field_name = "pk"
+            else:
+                field_name = mptt_field.remote_field.field_name
+
+            subquery_filters = {
+                rel_field: OuterRef(field_name),
+            }
+        subquery = rel_model.objects.filter(**subquery_filters, **extra_filters).values(
+            "pk"
+        ).distinct()
+        return queryset.annotate(**{count_attr: SQCount(subquery)})
 
 
 class Category(MPTTModel):

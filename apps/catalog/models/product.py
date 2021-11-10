@@ -9,6 +9,9 @@ class ProductQuerySet(models.QuerySet):
     def available(self):
         return self.filter(available=True, supplier_quantity__gt=0)
 
+    def photo_required(self):
+        return self.exclude(product_images__isnull=True)
+
 
 class ProductManager(models.Manager):
     def get_queryset(self):
@@ -18,6 +21,9 @@ class ProductManager(models.Manager):
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
+    shot_description = models.CharField('Краткое описание', max_length=120)
+    description = models.TextField('Описание')
+
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     available = models.BooleanField('Доступность', default=False, help_text='Доступно для заказа')
 
@@ -41,18 +47,6 @@ class Product(models.Model):
             return self.price - self.price * self.discount/100
         else:
             return self.price
-
-    @property
-    def shot_description(self):  # TODO добавить поле
-        return 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-
-    @property
-    def description(self):  # TODO добавить поле
-        return 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore' \
-               ' et dolore magna aliqua. Ut enim ad minim veniam, quis noexercit ullamco laboris nisi ut aliquip ex' \
-               ' ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore' \
-               ' eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia' \
-               ' deserunt mollit anim id.'
 
     @property
     def quantity(self):

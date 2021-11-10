@@ -17,6 +17,8 @@ class ProductFilter(django_filters.FilterSet):
         model = Product
         fields = {
             'category__slug': ['exact'],
+            'price': ['gte', 'lte'],
+            'slug': ['in'],
         }
 
     def filter_category(self, queryset, name, value):
@@ -32,15 +34,10 @@ class ProductFilter(django_filters.FilterSet):
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('id')
     lookup_field = 'slug'
     serializer_class = ProductSerializer
-
     filterset_class = ProductFilter
-    filterset_fields = {
-        'price': ['gte', 'lte'],
-        'slug': ['in'],
-    }
     search_fields = [
         'title',
     ]
@@ -60,12 +57,12 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         qs = super(ProductViewSet, self).get_queryset()
         if self.action == 'list':
-            qs = qs.available()
+            qs = qs.available().photo_required()
         return qs
 
     def clean_price_query_params(self, request):
         request.query_params._mutable = True
-        for condition in self.filterset_fields['price']:
+        for condition in self.filterset_class.get_fields().get('price', []):
             request.query_params.pop(f'price__{condition}', None)
         request.query_params._mutable = False
 
