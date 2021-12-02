@@ -151,7 +151,8 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
         'rest_framework.filters.SearchFilter',
-    ]
+    ],
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 DJOSER = {
@@ -175,7 +176,7 @@ CELERY_BROKER_URL = 'amqp://localhost'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGGING_PATH = '../logs'
+LOGGING_PATH = '../../logs'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

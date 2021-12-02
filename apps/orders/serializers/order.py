@@ -31,4 +31,3 @@ class OrderSerializer(serializers.ModelSerializer):
         OrderItem.objects.bulk_create(map(lambda item: OrderItem(order=order, **item), order_items_data))
 
         return order
-

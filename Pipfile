@@ -15,6 +15,7 @@ django-uuslug = "*"
 celery = "*"
 pillow = "*"
 django-filter = "*"
+uuid = "*"
 
 [requires]
 python_version = "3.8"
@@ -22,5 +23,6 @@ python_version = "3.8"
 [dev-packages]
 pytest = "*"
 pytest-django = "*"
+pytest-drf = "*"
 pytest-cov = "*"
 factory-boy = "*"
