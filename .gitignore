@@ -1,5 +1,4 @@
-/config/local_settings.py
 /.idea/
-/mydatabase
-/media/
 /.env
+/app/media/
+/app/config/local_settings.py
