@@ -2,24 +2,76 @@ version: "3"
 services:
   db:
     image: postgres
-    ports:
-      - '5432:5432'
     environment:
-      POSTGRES_DB: 'acce_shop'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
     restart: always
     volumes:
-      - ../docker_volumes/acce_shop.back/postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
 
   web:
-    restart: always
+    image: registry.gitlab.com/acce_shop/acce_shop-back:${CI_BUILD_REF_NAME}
     build:
       context: ./app
-    command: python manage.py runserver 0.0.0.0:8000
-    ports:
-      - "8000:8000"
+    entrypoint:
+      - /bin/sh
+      - entrypoint.sh
     depends_on:
       - db
-    env_file:
-      - ./.env.dev
+    environment:
+      - LOGGING_LEVEL=WARNING
+
+      - DJANGO_SECRET_KEY
+      - ALLOWED_HOSTS
+
+      - DATABASE_ENGINE
+      - DATABASE_NAME
+      - DATABASE_USERNAME
+      - DATABASE_PASSWORD
+      - DATABASE_HOST
+    restart: always
+    volumes:
+      - uwsgi:/application/uwsgi/:rw
+      - static:/application/acce_shop/app/static
+
+  test:
+    profiles: ["test"]
+    image: registry.gitlab.com/acce_shop/acce_shop-back:${CI_BUILD_REF_NAME}
+    command: pytest
+    restart: "no"
+    environment:
+      - DJANGO_SECRET_KEY=TEST_SECRET_KEY
+
+      - DATABASE_ENGINE
+      - DATABASE_NAME
+      - DATABASE_USERNAME
+      - DATABASE_PASSWORD
+      - DATABASE_HOST
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx:ro
+      - uwsgi:/application/uwsgi/:ro
+      - /etc/ssl/acce-shop:/etc/ssl/acce-shop/:ro
+
+      - static:/srv/static:ro
+      - media:/srv/media
+      - front_static:/srv/frontend/:ro
+    depends_on:
+      - web
+    restart: always
+
+volumes:
+  postgres_data:
+  uwsgi:
+  static:
+  media:
+
+  front_static:
+    external: true

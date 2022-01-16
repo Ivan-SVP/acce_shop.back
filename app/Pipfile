@@ -17,6 +17,7 @@ pillow = "*"
 django-filter = "*"
 uuid = "*"
 psycopg2-binary = '*'
+uwsgi = '==2.0.20'
 
 [requires]
 python_version = "3.8"

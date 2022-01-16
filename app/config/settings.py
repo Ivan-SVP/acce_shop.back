@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import datetime
 import os
 
-from django.utils.translation import gettext_lazy as _
-
 from pathlib import Path
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -30,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split()
 
 
 # Application definition
@@ -135,7 +133,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATICFILES_DIRS = [
-    BASE_DIR/'dev_static',
+    os.path.join(BASE_DIR, 'dev_static'),
 ]
 
 
@@ -179,7 +177,7 @@ CELERY_BROKER_URL = 'amqp://localhost'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGGING_PATH = '../logs'
+LOGGING_PATH = os.environ.get("LOGGING_PATH", '../../logs')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -210,10 +208,10 @@ LOGGING = {
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("DATABASE_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("DATABASE_NAME", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("DATABASE_USERNAME", "user"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD", "password"),
+        "ENGINE": os.environ.get("DATABASE_ENGINE"),
+        "NAME": os.environ.get("DATABASE_NAME"),
+        "USER": os.environ.get("DATABASE_USERNAME"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
         "HOST": os.environ.get("DATABASE_HOST", "localhost"),
         "PORT": os.environ.get("DATABASE_PORT", "5432"),
     }

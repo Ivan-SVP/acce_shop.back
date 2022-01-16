@@ -1,0 +1,39 @@
+image: docker:latest
+services:
+    - docker:dind
+
+before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+stages:
+  - build
+  - test
+  - deploy
+  - cleanup
+
+build:
+    stage: build
+    script:
+      - docker-compose build
+      - docker-compose push
+
+test:
+    stage: test
+    script:
+      - docker-compose pull test
+      - docker-compose run test
+
+deploy:
+    environment: production
+    stage: deploy
+    only:
+      - master
+    script:
+      - docker-compose up -d
+
+cleanup:
+  stage: cleanup
+  when: always
+  script:
+    - docker rm $(docker ps -aq -f status=exited) || echo "fail"
+    - docker rmi $(docker images -f dangling=true -q) || echo "fail"

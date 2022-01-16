@@ -1,0 +1,25 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: 'acce_shop'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+    restart: always
+    volumes:
+      - ../docker_volumes/postgres_data:/var/lib/postgresql
+
+  web:
+    restart: always
+    build:
+      context: ./app
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./.env.dev
