@@ -34,6 +34,7 @@ services:
     volumes:
       - uwsgi:/application/uwsgi/:rw
       - static:/application/acce_shop/app/static
+      - media:/application/acce_shop/app/media
 
   test:
     profiles: ["test"]

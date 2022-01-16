@@ -9,7 +9,7 @@ RUN pip install --upgrade pip && pip install -U pip setuptools wheel && pip inst
 RUN mkdir -p /application/logs && mkdir -p /application/uwsgi
 
 WORKDIR /application/acce_shop/app
-RUN mkdir static
+RUN mkdir static && mkdir media
 
 COPY Pipfile .
 COPY Pipfile.lock .
