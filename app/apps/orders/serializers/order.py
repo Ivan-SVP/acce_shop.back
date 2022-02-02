@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from apps.catalog.models import Product
 from apps.orders.models import Order, OrderItem
@@ -22,6 +23,11 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'name', 'email', 'phone', 'address', 'comment', 'uuid', 'order_items']
+
+    def validate_order_items(self, data):
+        if not data:
+            raise ValidationError('Заказ не может быть пустым.')
+        return data
 
     @transaction.atomic
     def create(self, validated_data):
