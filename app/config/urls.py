@@ -30,7 +30,7 @@ docs_schema_view = get_docs_schema_view()
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/docs/', docs_schema_view.with_ui('redoc', cache_timeout=0)),
+    path('api/docs/', docs_schema_view.with_ui()),
     path('api/', include(users_urls, namespace='users')),
     path('api/catalog/', include(catalog_urls, namespace='catalog')),
     path('api/orders/', include(orders_urls, namespace='orders')),

@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 django = "==3.2.5"
 django-mptt = "*"
-django-rest-swagger = "*"
+django-rest-swagger = "==2.1.2"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 djoser = "*"
