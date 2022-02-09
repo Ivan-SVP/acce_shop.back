@@ -23,3 +23,10 @@ services:
       - db
     env_file:
       - ./.env.dev
+    volumes:
+      - static:/application/acce_shop/app/static
+      - media:/application/acce_shop/app/media
+
+volumes:
+  static:
+  media:
